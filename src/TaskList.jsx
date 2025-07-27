@@ -13,10 +13,6 @@ export default function TaskList() {
   // const openForm = () => setIsFormOpen(true);
   const closeForm = () => setIsFormOpen(false);
 
-  // useEffect(() => {
-  //   console.log('Tasks changed: ', tasks);
-  // }, [tasks])
-
   const openEditTaskForm = (task) => {
     setEditingTask(task);
     setIsFormOpen(true);
@@ -27,30 +23,10 @@ export default function TaskList() {
     setIsFormOpen(true);
   }
 
-  // const handleSaveEdit = (taskId) => {
-  //   alert(`Task ${taskId} updated with text: ${editText}`);
-  //   setEditingId(null);
-  //   setEditText('');
-  // };
-  // const handleCancelEdit = () => {
-  //   setEditingId(null);
-  //   setEditText('');
-  // };
-
-  // const handleToggleComplete = (taskId) => { 
-  //   alert('Task completed!');
-  // }
-
   const handleDelete = (taskId) => {
     // alert('Task deleted!');
     removeTask(taskId);
   };
-
-  // const handleAddTask = () => {
-  //   setIsCreating(true);
-  //   setEditingId(null);
-  //   setEditText('');
-  // }
 
   const handleFormSubmit = (taskData) => {
     if (editingTask) {
@@ -79,17 +55,6 @@ export default function TaskList() {
       <ErrorDialog onClose={clearError}>{error}</ErrorDialog>
     );
   }
-  
-  // if (tasks.length === 0) {
-  //   return (
-  //     <div className="max-w-2xl mx-auto p-6">
-  //       <div className="bg-white rounded-lg border border-gray-200 shadow-md p-8">
-  //         <div className="text-center text-gray-500">No tasks yet. Add your first task to get started!</div>
-  //       </div>
-  //     </div>
-  //   );
-  // }
-
   {/* Tasks List */}
   return (
     <div className="max-w-2xl mx-auto p-6">
@@ -99,55 +64,8 @@ export default function TaskList() {
           <div key={task.id}>
             <div className="p-4 hover:bg-gray-50 transition-colors group">
               <div className="flex items-center gap-3">
-                {/* Checkbox */}
-                {/* <button
-                  onClick={() => handleToggleComplete(task.id)}
-                  className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
-                    task.completed
-                      ? 'bg-blue-500 border-blue-500 text-white'
-                      : 'border-gray-300 hover:border-blue-400'
-                  }`}
-                >
-                  {task.completed && (
-                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  )}
-                </button> */}
-
                 {/* Task Content */}
                 <div className="flex-1 min-w-0">
-                  {/* {editingId === task.id ? (
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={editText}
-                        onChange={(e) => setEditText(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            handleSaveEdit(task.id);
-                          }
-                          if (e.key === 'Escape') {
-                            handleCancelEdit();
-                          }
-                        }}
-                        className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        autoFocus
-                      />
-                      <button
-                        onClick={() => handleSaveEdit(task.id)}
-                        className="px-2 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600"
-                      >
-                        Save
-                      </button>
-                      <button
-                        onClick={handleCancelEdit}
-                        className="px-2 py-1 text-xs bg-gray-500 text-white rounded hover:bg-gray-600"
-                      >
-                        Cancel
-                      </button>
-                    </div> */}
-                  {/*) : (*/}
                     <div className="flex items-center justify-between">
                       <div className="text-sm text-gray-900">
                         {task.name || 'Untitled Task'}
@@ -174,9 +92,7 @@ export default function TaskList() {
                           </svg>
                         </button>
                       </div>
-                    </div>
-                  {/*)}*/}
-                  
+                    </div>                  
                   
                   {/* Due date */}
                   {task.due_date && (
@@ -196,11 +112,6 @@ export default function TaskList() {
                 </div>
               </div>
             </div>
-            
-            {/* Divider - don't show after last item */}
-            {/* {index < tasks.length - 1 && (
-              <div className="border-b border-gray-200"></div>
-            )} */}
              <div className="border-b border-gray-200"></div>
           </div>
         ))}

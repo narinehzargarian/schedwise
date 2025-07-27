@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import Calendar from './Calendar';
 import CoursesCarousel from './CoursesCarousel';
 import TaskList from './TaskList';
+import PlannedTasks from './PlannedTasks';
 
 export default function Dashboard() {
   return (
@@ -14,6 +15,7 @@ export default function Dashboard() {
       <div className="flex flex-1 overflow-y-auto">
         <div className="w-1/3 p-4">
           <TaskList />
+          <PlannedTasks />
         </div>
         <div className="w-2/3 p-4">
           <Calendar />

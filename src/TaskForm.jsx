@@ -61,6 +61,7 @@ export default function TaskForm({initialTask, onSubmit, onCancel}) {
           <input
             type="date"
             name="dueDate"
+            required
             defaultValue={initialTask?.due_date.split('T')[0] || ''}
             className="block text-sm text-gray-700 rounded-md border border-gray-300
                         shadow-sm focus:border-blue-500"
@@ -68,6 +69,7 @@ export default function TaskForm({initialTask, onSubmit, onCancel}) {
           <input 
             type="time"
             name="dueTime"
+            required 
             defaultValue={getHHMM(initialTask?.due_date)}
             className="block text-sm text-gray-700 rounded-md border border-gray-300
                         shadow-sm focus:border-blue-500"

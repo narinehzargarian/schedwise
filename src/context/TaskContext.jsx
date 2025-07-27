@@ -60,8 +60,8 @@ export function TaskProvider({ children }) {
     try {
       setError(null)
       const res = await updateTask(id, task);
-      setTasks(prev => prev.map(course => 
-        course.id === id? res.data: course
+      setTasks(prev => prev.map(task => 
+        task.id === id? res.data: task
       ));
       return res.data;
     }
@@ -75,8 +75,8 @@ export function TaskProvider({ children }) {
     try {
       setError(null);
       await deleteTask(id);
-      setTasks(prev => prev.filter(course => 
-        course.id !== id
+      setTasks(prev => prev.filter(task => 
+        task.id !== id
       ));
       return id;
     }

@@ -142,8 +142,8 @@ export default function CoursesCarousel() {
       )}
       
       {courses.map((course) => {
-        const startDate = course.start_date? new Date(course.start_date): null;
-        const endDate = course.end_date? new Date(course.end_date): null;
+        const startDate = course.start_date? new Date(course.start_date + "T00:00"): null; // Treat it as in local timezone
+        const endDate = course.end_date? new Date(course.end_date + "T00:00"): null;
         return(
           <div key={course.id} className="relative flex-shrink-0 w-48 h-48">
             {/* Course Card */ }
