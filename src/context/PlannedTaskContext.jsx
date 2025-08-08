@@ -82,10 +82,13 @@ export function PlanProvider({children}) {
       setPlans([]);
       setLoading(false);
     }
-  }, [tasks, courses, taskLoading, courseLoading])
+    // if (!taskLoading && !courseLoading) {
+    //   getPlans();
+    // }
+  }, [taskLoading, courseLoading, tasks, courses]);
 
 
-  return(
+  return (
     <PlannedTaskContext.Provider value={{plans, loading, error, clearError, getPlans, updatePlan, deletePlan}}>
       {children}
     </PlannedTaskContext.Provider>

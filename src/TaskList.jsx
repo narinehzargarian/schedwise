@@ -4,9 +4,11 @@ import { Plus } from 'lucide-react';
 import Modal from './Modal';
 import TaskForm from './TaskForm';
 import ErrorDialog from './ErrorDialog';
+import { PlannedTaskContext } from './context/PlannedTaskContext';
 
 export default function TaskList() {
   const { tasks, loading, error, addTask, editTask, removeTask, clearError} = useContext(TaskContext);
+  const { getPlans} = useContext(PlannedTaskContext);
   const [editingTask, setEditingTask] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
 
@@ -18,6 +20,7 @@ export default function TaskList() {
     setIsFormOpen(true);
   };
 
+
   const openNewTaskForm = () => {
     setEditingTask(null);
     setIsFormOpen(true);
@@ -28,7 +31,7 @@ export default function TaskList() {
     removeTask(taskId);
   };
 
-  const handleFormSubmit = (taskData) => {
+  const handleFormSubmit = async (taskData) => {
     if (editingTask) {
       editTask(editingTask.id, taskData);
       console.log('Edditing task: ', taskData);
@@ -37,6 +40,7 @@ export default function TaskList() {
       addTask(taskData);
       console.log('Adding task: ', taskData);
     }
+    getPlans();
     closeForm();
   }
   
@@ -100,7 +104,7 @@ export default function TaskList() {
                       Due: {new Date(task.due_date).toLocaleString('en-US', {
                         dateStyle: 'short', 
                         timeStyle: 'short', 
-                        timeZone: 'UTC'
+                        // timeZone: 'UTC'
                       })}
                     </div>
                   )}

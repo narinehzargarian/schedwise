@@ -89,6 +89,7 @@ export default function TaskForm({initialTask, onSubmit, onCancel}) {
           />
         </label>
       </div>
+      {/** Action buttons */}
       <div className="flex justify-end space-x-2">
         <button
           type="button"

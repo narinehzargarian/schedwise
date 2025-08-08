@@ -5,7 +5,7 @@ export function getPlannedTasks() {
 }
 
 export function updatePlannedTasks(id, newPlan) {
-  return api.put(`/studies/scheduledtasks/${id}/`, newPlan);
+  return api.patch(`/studies/scheduledtasks/${id}/`, newPlan);
 }
 
 export function deletePlannedTask(id) {
