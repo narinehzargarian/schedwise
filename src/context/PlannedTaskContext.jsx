@@ -15,16 +15,38 @@ export const PlannedTaskContext = createContext({
 })
 
 export function PlanProvider({children}) {
-  const { tasks, loading: taskLoading} = useContext(TaskContext);
+  const { tasks, loading: taskLoading, refetchTasks} = useContext(TaskContext);
   const { courses, loading: courseLoading } = useContext(CourseContext);
-  const { user } = useContext(AuthContext);
+  const { user, loading: userLoading } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [plans, setPlans] = useState([]);
 
   const clearError = () => setError(null);
 
-  const getPlans = async () => {
+  // const getPlans = async () => {
+  //   setLoading(true);
+  //   clearError();
+    
+  //   try {
+  //     const res = await getPlannedTasks();
+  //     setPlans(res.data);
+  //   }
+  //   catch(e) {  
+  //     console.log('Failed to fetch plans: ', e)
+  //     setError(e.message || 'Failed to fetch plans.');
+  //   }
+  //   finally {
+  //     setLoading(false);
+  //   }
+  // };
+  const getPlans = useCallback( async () => {
+    // Don't fetch if no user
+    if (!user) {
+      setPlans([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     clearError();
     
@@ -39,20 +61,28 @@ export function PlanProvider({children}) {
     finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   const updatePlan = async (id, plan) => {
     console.log(`Updating plan with id ${id} to `, plan);
     try {
       clearError();
       const res = await updatePlannedTasks(id, plan);
-      setPlans(prev => prev.map(plan => 
-        plan.id === id ? res.data: plan
-      ));
+      setPlans(prev => prev.map(p => (p.id === id ? res.data: p)));
+      // If backend returns a flag for taskDeleted, refresh task + plans
+      if (res.data?.taskDeleted) {
+        await refetchTasks();
+      }
+      await getPlans();
       return res.data
     }
     catch(e) {
       console.log('Failed to update the plan.' || e );
+      // If server regenerated and this id no longer exists, refetch
+      if (e?.response?.status === 404) {
+        await getPlans();
+        return;
+      }
       setError(e.message || 'Failed to update the plan');
     }
   }
@@ -63,6 +93,7 @@ export function PlanProvider({children}) {
       clearError();
       await deletePlannedTask(id);
       setPlans(prev => prev.filter(plan => plan.id !== id ));
+      await getPlans();
       return id;
     }
     catch (e) {
@@ -72,20 +103,20 @@ export function PlanProvider({children}) {
   }
 
   useEffect(() => {
-    if (!taskLoading && tasks) {
-      getPlans();
-    }
-    if (!courseLoading && courses) {
-      getPlans();
-    }
-    else {
-      setPlans([]);
-      setLoading(false);
-    }
-    // if (!taskLoading && !courseLoading) {
+    // if (!taskLoading && tasks) {
     //   getPlans();
     // }
-  }, [taskLoading, courseLoading, tasks, courses]);
+    // if (!courseLoading && courses) {
+    //   getPlans();
+    // }
+    // else {
+    //   setPlans([]);
+    //   setLoading(false);
+    // }
+    if (!userLoading && user && !taskLoading && !courseLoading) {
+      getPlans();
+    }
+  }, [userLoading, user, taskLoading, courseLoading, tasks.length, courses.length, getPlans]);
 
 
   return (

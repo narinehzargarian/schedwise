@@ -33,14 +33,14 @@ export default function TaskList() {
 
   const handleFormSubmit = async (taskData) => {
     if (editingTask) {
-      editTask(editingTask.id, taskData);
+      await editTask(editingTask.id, taskData);
       console.log('Edditing task: ', taskData);
     }
     else {
-      addTask(taskData);
+      await addTask(taskData);
       console.log('Adding task: ', taskData);
     }
-    getPlans();
+    await getPlans();
     closeForm();
   }
   

@@ -28,9 +28,9 @@ function Tasks() {
 }
 
 export default function MainLayout({ menuOpen, setMenuOpen }) {
-  const { user, loading } = useContext(AuthContext);
+  // const { user, loading } = useContext(AuthContext);
 
-  console.log('Current user:', user);
+  // console.log('Current user:', user);
 
   const navItems = [
     { name: "Dashboard", to: "/dashboard", icon: Home },
@@ -72,7 +72,7 @@ export default function MainLayout({ menuOpen, setMenuOpen }) {
               <Route 
                 path="/dashboard" 
                 element={
-                  <ProtectedRoute user={user}>
+                  <ProtectedRoute>
                     <Dashboard />
                   </ProtectedRoute>
                 }
@@ -80,14 +80,14 @@ export default function MainLayout({ menuOpen, setMenuOpen }) {
               <Route 
                 path="/courses" 
                 element={
-                  <ProtectedRoute user={user}>
+                  <ProtectedRoute>
                     <Courses />
                   </ProtectedRoute>
                 } />
               <Route 
                 path="/tasks" 
                 element={
-                  <ProtectedRoute user={user}>
+                  <ProtectedRoute>
                     <Tasks />
                   </ProtectedRoute>
                 } />

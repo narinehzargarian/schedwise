@@ -44,8 +44,9 @@ export function TaskProvider({ children }) {
   };
 
   const addTask = async (task) => {
+    setLoading(true);
+    setError(null);
     try {
-      setError(null)
       const res = await createTask(task);
       setTasks((prev) => [...prev, res.data])
       return res.data
@@ -53,6 +54,9 @@ export function TaskProvider({ children }) {
     catch(err) {
       console.log('Failed to add task: ', err)
       setError(err.message || 'Failed to add the task');
+    }
+    finally {
+      setLoading(false);
     }
   }
 
