@@ -4,6 +4,8 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getCourses } from './services/courses';
 import { CourseContext } from './context/CourseContext';
 import { AuthContext } from './context/AuthContext';
+import { PlannedTaskContext } from "./context/PlannedTaskContext";
+import { col } from "framer-motion/client";
 
 export default function Calendar() {
   const now = new Date();
@@ -25,6 +27,7 @@ export default function Calendar() {
   // const [loading, setLoading] = useState(true);
   // const { user, loading: userLoading} = useContext(AuthContext);
   const { courses, loading: courseLoading, error: courseError, refresh } = useContext(CourseContext);
+  const { plans } = useContext(PlannedTaskContext);
 
   // useEffect(() => {
   //   // const token = localStorage.getItem('token');
@@ -98,7 +101,7 @@ export default function Calendar() {
     // console.log("Parsing time: ", str, h, m, ampm);
 
     if (ampm === 'PM' && h < 12) h += 12; // Convert PM to 24-hour format
-    if (ampm === 'AM' && h === 12) h = 24;
+    if (ampm === 'AM' && h === 12) h = 0;
     return h + m / 60;
   }
 
@@ -147,6 +150,37 @@ export default function Calendar() {
     }).filter(Boolean);
   });
 
+  // Schedule of planned tasks
+  const plannedSchedule = plans.flatMap((plan) => {
+    try {
+      const start = plan.start_datetime ? new Date(plan.start_datetime): null;
+      const end = plan.end_datetime ? new Date(plan.end_datetime): null;
+      if (!start) return [];
+
+      // Keep only the dates that are within displayed week
+      if (start < weekStart || start > weekEnd) return [];
+
+      const jsDay = start.getDay();
+      const colIdx = days.findIndex((d) => d.weekday === jsDay);
+      if (colIdx === -1) return [];
+
+      const startHour = start.getHours() + start.getMinutes() / 60;
+      const endHour = end.getHours() + end.getMinutes() / 60;
+
+      return [{
+        col: colIdx + 1, // skip the hour label
+        top: (startHour + 1) * ROW_HEIGHT, 
+        height: (endHour - startHour) * ROW_HEIGHT,
+        name: plan.name || 'Study block',
+        label: start.toLocaleTimeString([], {hour : 'numeric', minute: '2-digit'}),
+        completed: !!plan.completed,
+      }]
+    }
+    catch (e) {
+      console.warn('Bad plan:', plan, e);
+      return [];
+    }
+  });
 
 
   // Previous, next weeks
@@ -309,8 +343,32 @@ export default function Calendar() {
                 </p>
               </div>
             )
-          })
-        }
+          }
+        )}
+        {
+          plannedSchedule.map((p, idx) => (
+              <div
+                key={idx}
+                className={`absolute rounded-md text-center justify-center overflow-hidden text-xs ${p.completed? 'bg-emerald-100': 'bg-amber-100'}`}
+                style={{
+                  left: `${p.col * (100 / 8)}%`,
+                  top: `${p.top}px`,
+                  height: `${p.height}px`,
+                  width: `${(100 / 8)}%`,
+                  padding: '4px',
+                  boxSizing: 'border-box',
+                  zIndex: 20,
+                }}
+              >
+                <p className={`font-semibold ${p.completed? 'text-emerald-900': 'text-amber-900'}`}>
+                  {p.label}
+                </p>
+                <p className={`font-semibold ${p.completed? 'text-emerald-900': 'text-amber-900'}`}>
+                  {p.name}
+                </p>
+              </div>
+          )
+        )}
         </div>
       </div>
     </div>

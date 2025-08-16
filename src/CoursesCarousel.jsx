@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useRef, useState, useEffect } from "react";
 import { CourseContext } from "./context/CourseContext";
 import { ChevronLeft, ChevronRight, MoreVertical, Plus } from "lucide-react";
 import CourseForm from "./CourseForm";
@@ -9,8 +9,37 @@ export default function CoursesCarousel() {
   const { courses, addCourse, deleteCourse, editCourse, error, clearError } = useContext(CourseContext);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingCourse, setEditingCourse] = useState(null);
-
   const [openMenuId, setOpenMenuId] = useState(null); // Three dots menu state
+  const scrollRef = useRef(null);
+  const [isScrollable, setIsScrollable] = useState(false); // whether overflow exists
+  const [canScrollLeft, setCanScrollLeft] = useState(false); // left arrow active?
+  const [canScrollRight, setCanScrollRight] = useState(false); // right arrow active?
+
+  const updateScrollState = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    
+    const hasOverflow = el.scrollWidth > el.clientWidth;
+    setIsScrollable(hasOverflow);
+    if (!hasOverflow) {
+      setCanScrollLeft(false);
+      setCanScrollRight(false);
+      return;
+    }
+
+    setCanScrollLeft(el.scrollLeft > 0);
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
+  }
+
+  // Recompute on mount, when courses change and on resize
+  useEffect(() => {
+    const id = requestAnimationFrame(updateScrollState);
+    window.addEventListener('resize', updateScrollState);
+    return () => {
+      cancelAnimationFrame(id);
+      window.removeEventListener('resize', updateScrollState);
+    }
+  }, [courses]);
 
   const handleAddCourse = () => {
     setEditingCourse(null);
@@ -18,8 +47,6 @@ export default function CoursesCarousel() {
   }
   const handleCloseForm = () => setIsFormOpen(false);
   
-  const scrollRef = useRef(null);
-
   const getDayName = (dayIndices) => {
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     return dayIndices
@@ -37,7 +64,9 @@ export default function CoursesCarousel() {
       current.scrollBy({
         left: dir === "left"? -scrollAmount : scrollAmount,
         behavior: "smooth",
-      })
+      });
+      // Update arrows after scroll starts
+      requestAnimationFrame(updateScrollState);
     }
   }
 
@@ -74,30 +103,37 @@ export default function CoursesCarousel() {
   }
 
   return (
-    <div className="relative max-w-full">
-      {/* Left Arrow Button */}
-      <button 
-        onClick={() => scroll("left")}
-        className="absolute left-2 top-1/2 transform -translate-y-1/2 z-10 bg-white/80 hover:bg-white rounded-full p-2 shadow-lg transition-all duration-200 hover:scale-110"
-        aria-label="Scroll left"
-      >
-        {/* Left Arrow Button */}
-        <ChevronLeft className="w-5 h-5 text-gray-700"/>
-      </button>
+    <div className="max-w-full">
+      <div className="relative">
+      {/* Show the scroll arrows only if the list is scrollable */}
+      {isScrollable && (
+        <>
+          {/* Left arrow button */}
+          <button
+            onClick={() => scroll("left")}
+            className={`absolute left-2 top-1/2 transform -translate-y-1/2 z-10 bg-white/80 hover:bg-white rounded-full p-2 shadow-lg transition-all duration-200 hover:scale-110 ${!canScrollLeft ? 'opacity-0 pointer-events-none': ''}`}
+            aria-label="Scroll left"
+          >
+            {/* Left Arrow Button */}
+            <ChevronLeft className="w-5 h-5 text-gray-700" />
+          </button>
 
-      {/* Right Arrow Button */}
-      <button 
-        onClick={() => scroll("right")}
-        className="absolute right-2 top-1/2 transform -translate-y-1/2 z-10 bg-white/80 hover:bg-white rounded-full p-2 shadow-lg transition-all duration-200 hover:scale-110"
-        aria-label="Scroll right"
-      >
-        {/* Left Arrow Button */}
-        <ChevronRight className="w-5 h-5 text-gray-700"/>
-      </button>
+          {/* Right Arrow Button */}
+          <button 
+            onClick={() => scroll("right")}
+            className={`absolute right-2 top-1/2 transform -translate-y-1/2 z-10 bg-white/80 hover:bg-white rounded-full p-2 shadow-lg transition-all duration-200 hover:scale-110 ${!canScrollRight? 'opacity-0 pointer-events-none': ''}`}
+            aria-label="Scroll right"
+          >
+            {/* Left Arrow Button */}
+            <ChevronRight className="w-5 h-5 text-gray-700"/>
+          </button>
+        </>
+      )}
 
       {/* Carousel Container */}
       <div
         ref={scrollRef}
+        onScroll={updateScrollState}
         className="flex overflow-x-auto space-x-4 p-4 scrollbar-hide scroll-smooth"
         style={{
           scrollbarWidth: "none",
@@ -192,10 +228,11 @@ export default function CoursesCarousel() {
 
       </div>
       <style jsx>{
-      `.scrollbar-hide:: -webkit-scrollbar {
+      `.scrollbar-hide::-webkit-scrollbar {
           display: none;
       }`
       }</style>
+      </div>
     </div>
   );
 }

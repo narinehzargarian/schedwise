@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CircleUser, RefreshCcw } from 'lucide-react';
 import { AuthContext } from './context/AuthContext';
@@ -8,8 +8,27 @@ import { Avatar } from './Avatar';
 export default function Profile({ menuOpen, setMenuOpen }) {
   const { user, loading, logout, deleteAccount } = useContext(AuthContext);
   const navigate = useNavigate();
+  const containerRef = useRef(null);
 
   console.log('Current user in Profile:', user);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    function onClickOutside(e) {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    }
+
+    document.addEventListener('mousedown', onClickOutside);
+    document.addEventListener('touchstart', onClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', onClickOutside);
+      document.removeEventListener('touchstart', onClickOutside);
+    }
+  }, [menuOpen, setMenuOpen]);
 
   async function handleLogout() {
     try {
@@ -42,7 +61,7 @@ export default function Profile({ menuOpen, setMenuOpen }) {
   }
 
   return (
-    <div className="h-16 flex items-center px-2 justify-start relative">
+    <div ref={containerRef} className="h-16 flex items-center px-2 justify-start relative">
         {user? (
           <button 
             className="flex w-full items-center hover:bg-blue-600 space-x-2 mb-8 transition-colors cursor-pointer rounded-md px-2 py-1"
@@ -67,7 +86,7 @@ export default function Profile({ menuOpen, setMenuOpen }) {
         { menuOpen && user && (
           <div className="absolute right-12 bottom-18 bg-gray-100 rounded-md shadow-lg w-40 z-30">
             <button
-              className="w-full text-left text-gray-600 text-sm hover:bg-gray-100 hover:text-gray-700 font-medium rounded-md px-4 py-1 cursor-pointer"
+              className="w-full text-left text-gray-600 text-sm hover:bg-gray-200 hover:text-gray-700 font-medium rounded-md px-4 py-1 cursor-pointer"
               onClick={() => {setMenuOpen(false); handleLogout();}} 
             >Log Out
             </button>

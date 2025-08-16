@@ -66,8 +66,8 @@ export default function MainLayout({ menuOpen, setMenuOpen }) {
           <Profile menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
         </aside>
         {/* Main Content */}
-        <div className="flex-1 bg-gray-100 flex flex-col">
-          <main className="relative flex-1 p-6 overflow-y-auto">
+        <div className="flex-1 min-w-0 bg-gray-100 flex flex-col">
+          <main className="relative flex-1 min-w-0 p-6 overflow-y-auto overflow-x-hidden">
             <Routes>
               <Route 
                 path="/dashboard" 
